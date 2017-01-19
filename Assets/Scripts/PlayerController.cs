@@ -10,6 +10,8 @@ public class PlayerController : NetworkBehaviour
 	public Transform groundCheckStart;
 	public Transform groundCheckFinish;
 	public LayerMask whatIsGround;
+	public GameObject bombPrefab;
+	public Transform bombSpawner;
 
 	private Rigidbody2D rigidbody;
 	private bool isGrounded = false;
@@ -38,6 +40,20 @@ public class PlayerController : NetworkBehaviour
 			vy = 0;
 		}
 
+		if(Input.GetKeyDown(KeyCode.Z))
+		{
+			CmdLayBomb();
+		}
+	}
+
+	/// <summary>
+	/// This function is called every fixed framerate frame, if the MonoBehaviour is enabled.
+	/// </summary>
+	void FixedUpdate()
+	{
+		if(!isLocalPlayer)
+			return;
+
 		rigidbody.velocity = new Vector2(vx * moveSpeed, vy);
 	}
 
@@ -57,5 +73,15 @@ public class PlayerController : NetworkBehaviour
 	{
 		vy = 0;
 		rigidbody.AddForce(new Vector2(0, jumpForce));
+	}
+
+	// this method is a network command
+	// i.e. it is called on client but is run on the server
+	[Command]
+	void CmdLayBomb()
+	{
+		var bomb = (GameObject)Instantiate(bombPrefab, bombSpawner.position, bombSpawner.rotation);
+
+		NetworkServer.Spawn(bomb);
 	}
 }

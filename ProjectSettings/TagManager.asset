@@ -16,7 +16,7 @@ TagManager:
   - 
   - Level
   - Player
-  - 
+  - Bomb
   - 
   - 
   - 
@@ -47,4 +47,7 @@ TagManager:
     locked: 0
   - name: Player
     uniqueID: 3183699943
+    locked: 0
+  - name: Bomb
+    uniqueID: 1970337453
     locked: 0
