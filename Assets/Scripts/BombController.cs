@@ -1,17 +1,21 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 
-public class BombController : MonoBehaviour
+public class BombController : NetworkBehaviour
 {
 	// used for checking the collision with sidewise ground element
 	public LayerMask whatIsBlocker;
 	public LayerMask whatIsPlayer;
 	public Transform blockCheck;
 	public Transform edgeCheck;
+	// this object will be activated at the time of explosion to inflict damage on other objects
+	public GameObject damage;
 
 	public GameObject explosionPrefab;
 	
 	[Range(0.0f, 6.0f)]
 	public float moveSpeed = 3.0f;
+	[SyncVar]
 	public int direction = 1;
 
 	private Rigidbody2D rigidbody;
@@ -24,14 +28,6 @@ public class BombController : MonoBehaviour
 	void Awake()
 	{
 		rigidbody = GetComponent<Rigidbody2D>();
-
-		// randomize bomb direction
-		float rand = Random.Range(-1, 1);
-		direction = (rand < 0) ? -1 : 1;
-
-		var localScale = transform.localScale;
-		localScale.x *= direction;
-		transform.localScale = localScale;
 
 		Invoke("Move", 1.0f);
 		Invoke("Xplode", 5.0f);
@@ -76,9 +72,12 @@ public class BombController : MonoBehaviour
 		canMove = true;
 	}
 
-	void Xplode()
+	// this will also be called if the object collides with other exploding bombs
+	public void Xplode()
 	{
-		Destroy(gameObject);
+		gameObject.GetComponent<SpriteRenderer>().color = Color.clear;
+		damage.SetActive(true);
+		Destroy(gameObject, 0.5f);
 		var explosion = (GameObject)Instantiate(explosionPrefab, transform.position, transform.rotation);
 		Destroy(explosion, 1.0f);
 	}

@@ -40,7 +40,7 @@ public class PlayerController : NetworkBehaviour
 			vy = 0;
 		}
 
-		if(Input.GetKeyDown(KeyCode.Z))
+		if(Input.GetKeyDown(KeyCode.LeftControl))
 		{
 			CmdLayBomb();
 		}
@@ -81,7 +81,12 @@ public class PlayerController : NetworkBehaviour
 	void CmdLayBomb()
 	{
 		var bomb = (GameObject)Instantiate(bombPrefab, bombSpawner.position, bombSpawner.rotation);
-
+		// randomize bomb direction
+		bomb.GetComponent<BombController>().direction = (Random.value < 0.5f) ? -1 : 1;
+		var localScale = bomb.transform.localScale;
+		localScale.x *= bomb.GetComponent<BombController>().direction;
+		bomb.transform.localScale = localScale;
+		
 		NetworkServer.Spawn(bomb);
 	}
 }
