@@ -13,6 +13,10 @@ public class PlayerController : NetworkBehaviour
 	public GameObject bombPrefab;
 	public Transform bombSpawner;
 
+	[Range(1, 5)]
+	public int bombLayInterval;
+
+	public bool canLayBombs = true;
 	private Rigidbody2D rigidbody;
 	private bool isGrounded = false;
 	private float vx;
@@ -55,6 +59,12 @@ public class PlayerController : NetworkBehaviour
 			return;
 
 		rigidbody.velocity = new Vector2(vx * moveSpeed, vy);
+
+		// temporary solution for camera follow
+		var camPosition = Camera.main.transform.position;
+		camPosition.x = transform.position.x;
+		camPosition.x = Mathf.Clamp(camPosition.x, -5.0f, 5.0f);
+		Camera.main.transform.position = camPosition;
 	}
 
 	public override void OnStartLocalPlayer()
@@ -80,13 +90,20 @@ public class PlayerController : NetworkBehaviour
 	[Command]
 	void CmdLayBomb()
 	{
-		var bomb = (GameObject)Instantiate(bombPrefab, bombSpawner.position, bombSpawner.rotation);
-		// randomize bomb direction
-		bomb.GetComponent<BombController>().direction = (Random.value < 0.5f) ? -1 : 1;
-		var localScale = bomb.transform.localScale;
-		localScale.x *= bomb.GetComponent<BombController>().direction;
-		bomb.transform.localScale = localScale;
-		
-		NetworkServer.Spawn(bomb);
+		if(canLayBombs)
+		{
+			var bomb = (GameObject)Instantiate(bombPrefab, bombSpawner.position, bombSpawner.rotation);
+			// randomize bomb direction
+			bomb.GetComponent<BombController>().direction = (Random.value < 0.5f) ? -1 : 1;
+			NetworkServer.Spawn(bomb);
+
+			canLayBombs = false;
+			Invoke("AllowToLayBombs", bombLayInterval);
+		}
+	}
+
+	void AllowToLayBombs()
+	{
+		canLayBombs = true;
 	}
 }

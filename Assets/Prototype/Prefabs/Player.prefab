@@ -280,7 +280,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c847ff5ae6c6e645bf920a9a2151cdb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 3
+  moveSpeed: 5
   jumpForce: 400
   groundCheckStart: {fileID: 4594305629479034}
   groundCheckFinish: {fileID: 4795022352717218}
@@ -289,6 +289,8 @@ MonoBehaviour:
     m_Bits: 768
   bombPrefab: {fileID: 1380758482876406, guid: 281378c29bf2b444f880d1f1da5493ce, type: 2}
   bombSpawner: {fileID: 4256667249626160}
+  bombLayInterval: 1
+  canLayBombs: 1
 --- !u!114 &114302534352958494
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -15,8 +15,9 @@ public class BombController : NetworkBehaviour
 	
 	[Range(0.0f, 6.0f)]
 	public float moveSpeed = 3.0f;
-	[SyncVar]
-	public int direction = 1;
+
+	[SyncVar(hook = "OnDirectionChanged")]
+	public int direction;
 
 	private Rigidbody2D rigidbody;
 	private bool isBlocked;
@@ -46,13 +47,9 @@ public class BombController : NetworkBehaviour
 
 			if(isBlocked || isAtEdge)
 			{
-				var localScale = transform.localScale;
-				localScale.x *= - 1;
-				transform.localScale = localScale;
-
 				direction *= -1;
 			}
-			else if(isNearPlayer)
+			if(isNearPlayer)
 			{
 				velX = 0;
 			}
@@ -80,5 +77,17 @@ public class BombController : NetworkBehaviour
 		Destroy(gameObject, 0.5f);
 		var explosion = (GameObject)Instantiate(explosionPrefab, transform.position, transform.rotation);
 		Destroy(explosion, 1.0f);
+	}
+
+	void OnDirectionChanged(int dir)
+	{
+		if((canMove == false) && (dir == 1))
+		{
+			return;
+		}
+		
+		var localScale = transform.localScale;
+		localScale.x *= - 1;
+		transform.localScale = localScale;
 	}
 }
